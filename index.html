@@ -1,0 +1,190 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #F8F8F8;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .chat__section {
+            width: 800px;
+            max-width: 90%;
+            background: #fff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            padding: 20px;
+            background: rgb(34, 32, 32);
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .brand h1 {
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .message__area {
+            height: 500px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding-top: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            border: none;
+            padding: 20px;
+            font-size: 16px;
+            outline: none;
+            background: #FBFBFB;
+        }
+
+        .message {
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .incoming {
+            background: #8F8BE8;
+            color: #fff;
+        }
+
+        .outgoing {
+            background: #e9eafd;
+            color: #787986;
+            margin-left: auto;
+        }
+
+        .message h4 {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            color: #333;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="chat__section">
+        <div class="brand">
+            <h1>ChatApp</h1>
+        </div>
+        <div class="message__area">
+
+            <!-- <div class="incoming message">
+                <h1>Mayank</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt temporibus explicabo maiores laudantium expedita tenetur sit in porro, 
+                 natus nobis soluta, inventore modi autem unde nostrum dicta quam amet quod.</p>
+             </div>
+ 
+             <div class="outgoing message">
+                 <h1>Gaurav</h1>
+                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis nesciunt, adipisci sapiente odio optio aut consequatur quos error tempora cum assumenda 
+                     eos aliquam consequuntur blanditiis fugiat maxime repellendus delectus dolorem?</p>
+             </div> -->
+
+        </div>
+
+        <textarea id="textarea" cols="30" rows="1" placeholder="Write a message..."></textarea>
+        </div>
+    </section>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- JS CODE -->
+
+    <script>
+
+        const socket = io();
+
+        let name;
+        var text = document.querySelector('#textarea');
+        var message_area = document.querySelector('.message__area')
+        do {
+            name = prompt("Enter your name first");
+        } while (!name)
+
+
+
+        text.addEventListener('keyup', (e) => {
+            if (e.key === "Enter") {
+                sendMessage(e.target.value);
+            }
+        })
+
+        //  create the sendMessage functionality
+        function sendMessage(msg) {
+            let mesgObj = {
+                user: name,
+                message: msg
+            }
+
+
+            appendMessage(mesgObj, "outgoing")
+
+            text.value = "";
+
+            //  send the message to the server
+            socket.emit('message', mesgObj)
+
+        }
+
+        function appendMessage(msg, type) {
+            let division = document.createElement("div");
+            let className = type;
+
+            division.classList.add(className, "message");
+
+            let markup = `
+             <h4>${msg.user}</h4>
+             
+             <p>${msg.message}</p>
+             `
+
+            division.innerHTML = markup;
+
+            message_area.appendChild(division);
+
+        }
+
+        //  Recieving the message
+        socket.on('message', (msg) => {
+            appendMessage(msg, "incoming");
+        })
+
+
+
+    </script>
+
+
+</body>
+
+</html>
